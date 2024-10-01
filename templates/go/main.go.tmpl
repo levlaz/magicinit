@@ -39,6 +39,7 @@ func New(
 	}
 }
 
+// Base returns a container with the go project mounted
 func (m *Go) Base(ctx context.Context) *dagger.Container {
 	return dag.
 		Container().
@@ -47,18 +48,21 @@ func (m *Go) Base(ctx context.Context) *dagger.Container {
 		WithWorkdir("/src")
 }
 
+// Build returns a container with the go project mounted and builds the project
 func (m *Go) Build(ctx context.Context) *dagger.Container {
 	return m.
 		Base(ctx).
 		WithExec([]string{"go", "build", "-o", "main", "."})
 }
 
+// Lint returns a container with the go project mounted and runs the go vet command
 func (m *Go) Lint(ctx context.Context) *dagger.Container {
 	return m.
 		Base(ctx).
 		WithExec([]string{"go", "vet", "."})
 }
 
+// Test returns a container with the go project mounted and runs the go test command
 func (m *Go) Test(ctx context.Context) *dagger.Container {
 	return m.
 		Base(ctx).
