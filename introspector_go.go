@@ -4,6 +4,8 @@ import (
 	"context"
 	"dagger/magicinit/internal/dagger"
 	"fmt"
+	"log"
+	"regexp"
 	"slices"
 )
 
@@ -23,7 +25,21 @@ func (g *goInspector) Lookup(ctx context.Context, source *dagger.Directory) (boo
 }
 
 func (g *goInspector) Inspect(ctx context.Context, source *dagger.Directory) (*SourceInspect, error) {
-	return &SourceInspect{
+	var inspection = &SourceInspect{
 		Language: "go",
-	}, nil
+	}
+
+	goModContent, err := source.File("go.mod").Contents(ctx)
+	if err != nil {
+		log.Printf("Go.Inspect: failed to read go.mod: %v", err)
+		return inspection, nil
+	}
+
+	re := regexp.MustCompile(`go\s+([\d.]+)`)
+	matches := re.FindStringSubmatch(goModContent)
+	if len(matches) > 1 {
+		inspection.Version = matches[1]
+	}
+
+	return inspection, nil	
 }

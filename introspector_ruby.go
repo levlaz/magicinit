@@ -4,9 +4,10 @@ import (
 	"context"
 	"dagger/magicinit/internal/dagger"
 	"fmt"
+	"log"
+	"regexp"
 	"slices"
 )
-
 
 type rubyInspector struct{}
 
@@ -24,7 +25,21 @@ func (r *rubyInspector) Lookup(ctx context.Context, source *dagger.Directory) (b
 }
 
 func (r *rubyInspector) Inspect(ctx context.Context, source *dagger.Directory) (*SourceInspect, error) {
-	return &SourceInspect{
+	var inspection = &SourceInspect{
 		Language: "ruby",
-	}, nil
+	}
+
+	gemfileContent, err := source.File("Gemfile").Contents(ctx)
+	if err != nil {
+		log.Printf("Ruby.Inspect: failed to read Gemfile: %v", err)
+		return inspection, nil
+	}
+
+	re := regexp.MustCompile(`ruby\s+['"][><=~!]+\s*([\d.]+)['"]`)
+	matches := re.FindStringSubmatch(gemfileContent)
+	if len(matches) > 1 {
+		inspection.Version = matches[1]
+	}
+
+	return inspection, nil
 }
