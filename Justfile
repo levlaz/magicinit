@@ -17,6 +17,9 @@ ruby:
 go:
     dagger call init --source https://github.com/DiceDB/dice --output .go
 
+test-go:
+    dagger -m .go/.dagger --source https://github.com/DiceDB/dice call ci 
+
 all:
     just python
     just typescript
