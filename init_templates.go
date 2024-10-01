@@ -37,7 +37,7 @@ func (m *Magicinit) initGo(ctx context.Context, inspection *SourceInspect) (*dag
 
 func (m *Magicinit) initPython(ctx context.Context, inspection *SourceInspect) (*dagger.Directory, error) {
 	pythonTemplateDir := dag.CurrentModule().Source().Directory("templates/python")
-	pythonTemplate, err := pythonTemplateDir.File("main.py.tmpl").Contents(ctx)
+	pythonTemplate, err := pythonTemplateDir.File("/src/main/main.py.tmpl").Contents(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("Magicinit.initPython: failed to read python template: %w", err)
 	}
@@ -59,7 +59,7 @@ func (m *Magicinit) initPython(ctx context.Context, inspection *SourceInspect) (
 		return nil, fmt.Errorf("Magicinit.initPython: failed to execute python template: %w", err)
 	}
 
-	return pythonTemplateDir.WithNewFile("main.py", buf.String()).WithoutFile("main.py.tmpl"), nil
+	return pythonTemplateDir.WithNewFile("/src/main/main.py", buf.String()).WithoutFile("/src/main/main.py.tmpl"), nil
 }
 
 func (m *Magicinit) initTypescript(ctx context.Context, inspection *SourceInspect) (*dagger.Directory, error) {
