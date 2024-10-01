@@ -88,3 +88,30 @@ func (m *Magicinit) initTypescript(ctx context.Context, inspection *SourceInspec
 
 	return typescriptTemplateDir.WithNewFile("src/index.ts", buf.String()).WithoutFile("src/index.ts.tmpl"), nil
 }
+
+func (m *Magicinit) initRuby(ctx context.Context, inspection *SourceInspect) (*dagger.Directory, error) {
+	rubyTemplateDir := dag.CurrentModule().Source().Directory("templates/ruby")
+	rubyTemplate, err := rubyTemplateDir.File("src/index.ts.tmpl").Contents(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("Magicinit.initRuby: failed to read ruby template: %w", err)
+	}
+
+	var rubyTemplateData = struct {
+		RubyVersion string
+	}{
+		RubyVersion: inspection.Version,
+	}
+
+	tmpl, err := template.New("ruby.tmpl").Parse(rubyTemplate)
+	if err != nil {
+		return nil, fmt.Errorf("Magicinit.initRuby: failed to parse ruby template: %w", err)
+	}
+
+	var buf bytes.Buffer
+	err = tmpl.Execute(&buf, rubyTemplateData)
+	if err != nil {
+		return nil, fmt.Errorf("Magicinit.initRuby: failed to execute ruby template: %w", err)
+	}
+
+	return rubyTemplateDir.WithNewFile("src/index.ts", buf.String()).WithoutFile("src/index.ts.tmpl"), nil
+}

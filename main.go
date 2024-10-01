@@ -32,6 +32,8 @@ func (m *Magicinit) Init(
 		return m.initPython(ctx, inspection)
 	case "typescript":
 		return m.initTypescript(ctx, inspection)
+	case "ruby":
+		return m.initRuby(ctx, inspection)
 	default:
 		return nil, fmt.Errorf("Magicinit.Init: unsupported language %s", inspection.Language)
 	}
