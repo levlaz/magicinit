@@ -11,13 +11,8 @@ It's not magic. It's Dagger.™
 Infer project and generate dagger pipeline.
 
 ```
-dagger call magicinit -o .dagger
+dagger call magicinit --source . -o .dagger
 ```
-
-Optional args 
-
-`--provider` default to gha, in the future be able to generate for others as well 
-`--source` default to .
 
 # Sample Projects for Testing 
 
@@ -30,3 +25,4 @@ Ruby -> https://github.com/mastodon/mastodon
 * be able to create the dir ourselves in the future 
 * be able to specify which SDK you want to use 
 * make Dagger version in template dagger.json be more intelligent
+* add this to dagger init by default (will allow us to not have to include --source)
