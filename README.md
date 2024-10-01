@@ -11,7 +11,7 @@ It's not magic. It's Dagger.™
 Infer project and generate dagger pipeline.
 
 ```
-dagger call magicinit --source . -o .dagger
+dagger call magicinit --source . --output .dagger
 ```
 
 # Sample Projects for Testing 
