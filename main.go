@@ -11,7 +11,7 @@ type Magicinit struct{}
 func (m *Magicinit) Init(
 	ctx context.Context,
 
-	//*defaultPath="/"
+	//+defaultPath="/"
 	source *dagger.Directory,
 
 	//+optional
@@ -42,7 +42,7 @@ func (m *Magicinit) Init(
 func (m *Magicinit) Inspect(
 	ctx context.Context,
 
-	//*defaultPath="/"
+	//+defaultPath="/"
 	source *dagger.Directory,
 ) (*SourceInspect, error) {
 	inspectors := List()
