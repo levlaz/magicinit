@@ -25,6 +25,9 @@ class Ruby {
   {{ end -}}
   source: Directory
 
+  @func()
+  ctr: Container
+
   /**
    * Module level arguments using constructor
    * @param source location of source code, defaults to current working dir
@@ -34,26 +37,31 @@ class Ruby {
    */
   constructor(@argument({ defaultPath: "/" }) source: Directory) {
     this.source = source
+    this.ctr = dag.container()
   }
 
   /**
    * Base container for Ruby project
    */
   @func()
-  base(): Container {
-    return dag.
+  base(): Ruby {
+    this.ctr = dag.
       container().
       from(`ruby:${this.rubyVersion}`).
       withMountedDirectory("/src", this.source).
       withWorkdir("/src")
+
+    return this
   }
 
   /**
    * Build the project
    */
   @func()
-  build(): Container {
-    return this.base().withExec(["bundle", "install"])
+  build(): Ruby {
+    this.ctr = this.ctr.withExec(["bundle", "install"])
+
+    return this
   }
 
   /**
@@ -61,7 +69,7 @@ class Ruby {
    */
   @func()
   lint(): Container {
-    return this.base().withExec(["bundle", "exec", "rubocop"])
+    return this.ctr.withExec(["bundle", "exec", "rubocop"])
   }
 
   /**
@@ -69,6 +77,21 @@ class Ruby {
    */
   @func()
   test(): Container {
-    return this.base().withExec(["bundle", "exec", "rspec"])
+    return this.ctr.withExec(["bundle", "exec", "rspec"])
+  }
+
+  /**
+   * Run the CI pipeline
+   */
+  @func()
+  async ci(): Promise<void> {
+    // Install deps if that's not already been done
+    this.base().build()
+
+    await Promise.all([
+      this.lint().sync(),
+      this.test().sync(),
+    ])
   }
 }
+

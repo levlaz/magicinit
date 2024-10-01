@@ -12,7 +12,11 @@ test-typescript:
     dagger -m .typescript/.dagger --source https://github.com/medplum/medplum call ci 
 
 ruby:
-    dagger call init --source https://github.com/mastodon/mastodon --output .ruby
+    dagger call init --source https://github.com/aws/aws-sdk-ruby --output .ruby
+
+
+test-ruby:
+    dagger -m .ruby/.dagger --source https://github.com/aws/aws-sdk-ruby call ci 
 
 go:
     dagger call init --source https://github.com/DiceDB/dice --output .go
