@@ -46,7 +46,7 @@ func (m *Magicinit) Init(
 		if err != nil {
 			return nil, fmt.Errorf("Magicinit.Init: failed to initialize go: %w", err)
 		}
-		outputs = outputs.WithDirectory(target, dir)
+		outputs = outputs.WithDirectory(".dagger", dir)
 	case "python":
 		dir, err := m.initPython(ctx, inspection)
 		if err != nil {
