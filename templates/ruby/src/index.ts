@@ -1,41 +1,66 @@
 /**
- * A generated module for Ruby functions
- *
- * This module has been generated via dagger init and serves as a reference to
- * basic module structure as you get started with Dagger.
- *
- * Two functions have been pre-created. You can modify, delete, or add to them,
- * as needed. They demonstrate usage of arguments and return types using simple
- * echo and grep commands. The functions can be called from the dagger CLI or
- * from one of the SDKs.
- *
- * The first line in this comment block is a short description line and the
- * rest is a long description with more detail on the module's purpose or usage,
- * if appropriate. All modules should have a short description.
+A Dagger pipeline for Python generated via Magicinit™
+
+                       _      _       _ _   
+                      (_)    (_)     (_) |  
+ _ __ ___   __ _  __ _ _  ___ _ _ __  _| |_ 
+| '_ ` _ \ / _` |/ _` | |/ __| | '_ \| | __|
+| | | | | | (_| | (_| | | (__| | | | | | |_ 
+|_| |_| |_|\__,_|\__, |_|\___|_|_| |_|_|\__|
+                  __/ |                     
+                 |___/                      
  */
-import { dag, Container, Directory, object, func } from "@dagger.io/dagger"
+import { dag, Container, Directory, object, func, argument } from "@dagger.io/dagger"
 
 @object()
 class Ruby {
+  rubyVersion: string = "3.2"
+  source: Directory
+
   /**
-   * Returns a container that echoes whatever string argument is provided
+   * Module level arguments using constructor
+   * @param source location of source code, defaults to current working dir
+   *
+   * more info on defaultPath: https://docs.dagger.io/manuals/developer/functions/#directories-and-files
+   * more info on constructor: https://docs.dagger.io/manuals/developer/entrypoint-function/
    */
-  @func()
-  containerEcho(stringArg: string): Container {
-    return dag.container().from("alpine:latest").withExec(["echo", stringArg])
+  constructor(@argument({ defaultPath: "/" }) source: Directory) {
+    this.source = source
   }
 
   /**
-   * Returns lines that match a pattern in the files of the provided Directory
+   * Base container for Ruby project
    */
   @func()
-  async grepDir(directoryArg: Directory, pattern: string): Promise<string> {
-    return dag
-      .container()
-      .from("alpine:latest")
-      .withMountedDirectory("/mnt", directoryArg)
-      .withWorkdir("/mnt")
-      .withExec(["grep", "-R", pattern, "."])
-      .stdout()
+  base(): Container {
+    return dag.
+      container().
+      from("ruby:latest").
+      withMountedDirectory("/src", this.source).
+      withWorkdir("/src")
+  }
+
+  /**
+   * Build the project
+   */
+  @func()
+  build(): Container {
+    return this.base().withExec(["bundle", "install"])
+  }
+
+  /**
+   * Lint the project
+   */
+  @func()
+  lint(): Container {
+    return this.base().withExec(["bundle", "exec", "rubocop"])
+  }
+
+  /**
+   * Test the project
+   */
+  @func()
+  test(): Container {
+    return this.base().withExec(["bundle", "exec", "rspec"])
   }
 }

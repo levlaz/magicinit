@@ -19,6 +19,6 @@ Optional args
 # Sample Projects for Testing 
 
 Go -> https://github.com/DiceDB/dice 
-Typescript -> https://github.com/apache/superset 
+Typescript -> https://github.com/medplum/medplum
 Python -> https://github.com/Cinnamon/kotaemon
 Ruby -> https://github.com/mastodon/mastodon
