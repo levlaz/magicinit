@@ -17,7 +17,12 @@ from typing import Annotated
 @object_type
 class Python:
     source: Annotated[dagger.Directory, DefaultPath("/"), Doc("Source directory of the project, defaults to the root of the repository")]
+    {{ if .PythonVersion -}}
+    python_version: Annotated[str, "{{.PythonVersion}}", Doc("Python version to use, defaults to latest")]
+    {{ else -}}
+    # [heads up] We could not infer the python version, so we default to latest
     python_version: Annotated[str, "latest", Doc("Python version to use, defaults to latest")]
+    {{ end -}}
 
     @function
     def base(self) -> dagger.Container:
