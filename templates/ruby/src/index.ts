@@ -8,13 +8,16 @@ A Dagger pipeline for Python generated via Magicinit™
 | | | | | | (_| | (_| | | (__| | | | | | |_ 
 |_| |_| |_|\__,_|\__, |_|\___|_|_| |_|_|\__|
                   __/ |                     
-                 |___/                      
+                 |___/    
+                 
+We wish this example was written in Ruby, please join us in 
+discord to help us make this a reality: https://discord.com/invite/dagger-io
  */
 import { dag, Container, Directory, object, func, argument } from "@dagger.io/dagger"
 
 @object()
 class Ruby {
-  rubyVersion: string = "3.2"
+  rubyVersion: string = "latest"
   source: Directory
 
   /**
@@ -35,7 +38,7 @@ class Ruby {
   base(): Container {
     return dag.
       container().
-      from("ruby:latest").
+      from(`ruby:${this.rubyVersion}`).
       withMountedDirectory("/src", this.source).
       withWorkdir("/src")
   }
