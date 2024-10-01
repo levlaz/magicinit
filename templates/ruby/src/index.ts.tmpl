@@ -17,7 +17,12 @@ import { dag, Container, Directory, object, func, argument } from "@dagger.io/da
 
 @object()
 class Ruby {
+  {{ if .RubyVersion -}}
+  rubyVersion: string = "{{ .RubyVersion }}"
+  {{ else -}}
+  // [heads up] We could not infer the ruby version, so we default to latest
   rubyVersion: string = "latest"
+  {{ end -}}
   source: Directory
 
   /**
