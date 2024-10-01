@@ -22,6 +22,9 @@ class Typescript {
   {{ end -}}
   source: Directory
 
+  @func()
+  ctr: Container
+
   /**
    * Module level arguments using constructor
    * @param source location of source code, defaults to current working dir
@@ -31,18 +34,28 @@ class Typescript {
    */
   constructor(@argument({ defaultPath: "/" }) source: Directory) {
     this.source = source
+    this.ctr = dag.container()
   }
 
   /**
    * Base container for Typescript project
    */
   @func()
-  base(): Container {
-    return dag.
+  base(): Typescript {
+    this.ctr = dag.
       container().
-      from(`ruby:${this.typescriptVersion}`).
+      from(`node:${this.typescriptVersion}`).
       withMountedDirectory("/src", this.source).
       withWorkdir("/src")
+
+    return this
+  }
+
+  @func()
+  setup(): Typescript {
+    this.ctr = this.ctr.withExec(["npm", "install"])
+
+    return this
   }
 
   /**
@@ -50,7 +63,7 @@ class Typescript {
    */
   @func()
   build(): Container {
-    return this.base().withExec(["npm", "install"])
+    return this.ctr.withExec(["npm", "build"])
   }
 
   /**
@@ -58,7 +71,7 @@ class Typescript {
    */
   @func()
   lint(): Container {
-    return this.base().withExec(["npm", "lint"])
+    return this.ctr.withExec(["npm", "lint"])
   }
 
   /**
@@ -66,6 +79,21 @@ class Typescript {
    */
   @func()
   test(): Container {
-    return this.base().withExec(["npm", "test"])
+    return this.ctr.withExec(["npm", "test"])
+  }
+
+  /**
+    * Run the CI
+    */
+  @func()
+  async ci(): Promise<void> {
+    // Install deps if that's not already been done
+    this.base().setup()
+
+    await Promise.all([
+      this.build().sync(),
+      this.lint().sync(),
+      this.test().sync(),
+    ])
   }
 }
