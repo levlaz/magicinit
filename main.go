@@ -21,17 +21,31 @@ import (
 
 type Magicinit struct{}
 
-// Returns a container that echoes whatever string argument is provided
-func (m *Magicinit) ContainerEcho(stringArg string) *dagger.Container {
-	return dag.Container().From("alpine:latest").WithExec([]string{"echo", stringArg})
+func (m *Magicinit) Init(
+	ctx context.Context,
+
+	//*defaultPath="/"
+	source *dagger.Directory,
+
+	//+optional
+	sdk string,
+
+	//+optional
+	provider string,
+) (*dagger.Directory, error) {
+	return source, nil
 }
 
-// Returns lines that match a pattern in the files of the provided Directory
-func (m *Magicinit) GrepDir(ctx context.Context, directoryArg *dagger.Directory, pattern string) (string, error) {
-	return dag.Container().
-		From("alpine:latest").
-		WithMountedDirectory("/mnt", directoryArg).
-		WithWorkdir("/mnt").
-		WithExec([]string{"grep", "-R", pattern, "."}).
-		Stdout(ctx)
+type SourceInspect struct {
+	Language string
+	Version string
+}
+
+func (m *Magicinit) Inspect(
+	ctx context.Context,
+
+	//*defaultPath="/"
+	source *dagger.Directory,
+) (*SourceInspect, error) {
+	return &SourceInspect{}, nil
 }
