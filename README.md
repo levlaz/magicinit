@@ -25,4 +25,6 @@ Ruby -> https://github.com/mastodon/mastodon
 * be able to create the dir ourselves in the future 
 * be able to specify which SDK you want to use 
 * make Dagger version in template dagger.json be more intelligent
-* add this to dagger init by default (will allow us to not have to include --source)
+* add this to dagger init by default 
+    * will allow us to not have to include --source
+    * will allow to add dagger.json to the repo root 

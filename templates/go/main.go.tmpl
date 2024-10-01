@@ -14,6 +14,7 @@ import (
 	"context"
 	"dagger/go/internal/dagger"
 	"fmt"
+	"golang.org/x/sync/errgroup"
 )
 
 type Go struct {
@@ -40,7 +41,7 @@ func New(
 }
 
 // Base returns a container with the go project mounted
-func (m *Go) Base(ctx context.Context) *dagger.Container {
+func (m *Go) Base() *dagger.Container {
 	return dag.
 		Container().
 		From(fmt.Sprintf("golang:%s", m.GoVersion)).
@@ -49,22 +50,47 @@ func (m *Go) Base(ctx context.Context) *dagger.Container {
 }
 
 // Build returns a container with the go project mounted and builds the project
-func (m *Go) Build(ctx context.Context) *dagger.Container {
+func (m *Go) Build() *dagger.Container {
 	return m.
-		Base(ctx).
+		Base().
 		WithExec([]string{"go", "build", "-o", "main", "."})
 }
 
 // Lint returns a container with the go project mounted and runs the go vet command
-func (m *Go) Lint(ctx context.Context) *dagger.Container {
+func (m *Go) Lint() *dagger.Container {
 	return m.
-		Base(ctx).
+		Base().
 		WithExec([]string{"go", "vet", "."})
 }
 
 // Test returns a container with the go project mounted and runs the go test command
-func (m *Go) Test(ctx context.Context) *dagger.Container {
+func (m *Go) Test() *dagger.Container {
 	return m.
-		Base(ctx).
+		Base().
 		WithExec([]string{"go", "test", "-v", "."})
+}
+
+// Run entire pipleine
+// 
+// uses error group to run all commands in parallel 
+func (m *Go) Ci(ctx context.Context) error {
+	
+	eg, gctx := errgroup.WithContext(ctx)
+
+	eg.Go(func() error {
+		_, err := m.Build().Sync(gctx)
+		return err
+	})
+
+	eg.Go(func() error {
+		_, err := m.Lint().Sync(gctx)
+		return err
+	})
+
+	eg.Go(func() error {
+		_, err := m.Test().Sync(gctx)
+		return err
+	})
+
+	return eg.Wait()
 }
