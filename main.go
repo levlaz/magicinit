@@ -54,9 +54,17 @@ func (m *Magicinit) Init(
 		}
 		outputs = outputs.WithDirectory(target, dir)
 	case "typescript":
-		return m.initTypescript(ctx, inspection)
+		dir, err := m.initTypescript(ctx, inspection)
+		if err != nil {
+			return nil, fmt.Errorf("Magicinit.Init: failed to initialize typescript: %w", err)
+		}
+		outputs = outputs.WithDirectory(target, dir)
 	case "ruby":
-		return m.initRuby(ctx, inspection)
+		dir, err := m.initRuby(ctx, inspection)
+		if err != nil {
+			return nil, fmt.Errorf("Magicinit.Init: failed to initialize ruby: %w", err)
+		}
+		outputs = outputs.WithDirectory(target, dir)
 	default:
 		return nil, fmt.Errorf("Magicinit.Init: unsupported language %s", inspection.Language)
 	}

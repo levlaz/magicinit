@@ -8,17 +8,17 @@ It's not magic. It's Dagger.™
 
 # Usage 
 
-Infer project and generate dagger pipeline.
+Infer project and generate dagger pipeline along with a GitHub Actions workflow that will execute your Dagger pipeline.
 
 ```
-dagger call magicinit --source . --output .dagger
+dagger call magicinit --source . --output .
 ```
 
 # Sample Projects for Testing 
 
 Go -> https://github.com/DiceDB/dice 
 Typescript -> https://github.com/medplum/medplum
-Python -> https://github.com/Cinnamon/kotaemon
+Python -> https://github.com/Infisical/python-sdk-official
 Ruby -> https://github.com/mastodon/mastodon
 
 # Future Improvements 
@@ -27,4 +27,4 @@ Ruby -> https://github.com/mastodon/mastodon
 * make Dagger version in template dagger.json be more intelligent
 * add this to dagger init by default 
     * will allow us to not have to include --source
-    * will allow to add dagger.json to the repo root 
+    * will allow to add dagger.json to the repo root
