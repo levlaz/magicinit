@@ -22,13 +22,14 @@ type Go struct {
 }
 
 func New(
-	{{ if .GoVersion }}
+	{{ if .GoVersion -}}
 	// +default="{{ .GoVersion }}"
-	{{ else }}
+	{{ else -}}
 	// [heads up] We could not infer the go version, so we default to latest
 	// +default="latest"
-	{{ end }}
+	{{ end -}}
 	goVersion string,
+
 	// +defaultPath="/"
 	source *dagger.Directory,
 ) *Go {
