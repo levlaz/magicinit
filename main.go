@@ -13,13 +13,13 @@ func (m *Magicinit) Init(
 
 	source *dagger.Directory,
 
-	//+optional
+	// +optional
 	sdk string,
 
-	//+optional
+	// +optional
 	provider string,
 
-	//+default=".dagger"
+	// +default=".dagger"
 	target string,
 ) (*dagger.Directory, error) {
 	outputs := dag.Directory()
@@ -38,7 +38,7 @@ func (m *Magicinit) Init(
 			}).
 		Config()
 
-	outputs = outputs.WithDirectory(".github", gha)
+	outputs = outputs.WithDirectory("/", gha)
 
 	switch inspection.Language {
 	case "go":
@@ -46,7 +46,7 @@ func (m *Magicinit) Init(
 		if err != nil {
 			return nil, fmt.Errorf("Magicinit.Init: failed to initialize go: %w", err)
 		}
-		outputs = outputs.WithDirectory(".dagger", dir)
+		outputs = outputs.WithDirectory(target, dir)
 	case "python":
 		dir, err := m.initPython(ctx, inspection)
 		if err != nil {
