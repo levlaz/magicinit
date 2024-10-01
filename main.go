@@ -17,6 +17,7 @@ package main
 import (
 	"context"
 	"dagger/magicinit/internal/dagger"
+	"fmt"
 )
 
 type Magicinit struct{}
@@ -36,16 +37,26 @@ func (m *Magicinit) Init(
 	return source, nil
 }
 
-type SourceInspect struct {
-	Language string
-	Version string
-}
-
 func (m *Magicinit) Inspect(
 	ctx context.Context,
 
 	//*defaultPath="/"
 	source *dagger.Directory,
 ) (*SourceInspect, error) {
-	return &SourceInspect{}, nil
+	inspectors := List()
+
+	for _, inspector := range inspectors {
+		isLanguage, err := inspector.Lookup(ctx, source)
+		if err != nil {
+			return nil, fmt.Errorf("Magicinit.Inspect: failed to lookup source directory for language: %w", err)
+		}
+
+		if !isLanguage {
+			continue
+		}
+		
+		return inspector.Inspect(ctx, source)
+	}
+
+	return nil, fmt.Errorf("Magicinit.Inspect: failed to inspect the source directory: no language found")
 }
