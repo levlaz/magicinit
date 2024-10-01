@@ -1,5 +1,5 @@
 /**
-A Dagger pipeline for Python generated via Magicinit™
+A Dagger pipeline for Tpescript generated via Magicinit™
 
                        _      _       _ _   
                       (_)    (_)     (_) |  

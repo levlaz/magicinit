@@ -1,37 +1,59 @@
-// A generated module for Go functions
-//
-// This module has been generated via dagger init and serves as a reference to
-// basic module structure as you get started with Dagger.
-//
-// Two functions have been pre-created. You can modify, delete, or add to them,
-// as needed. They demonstrate usage of arguments and return types using simple
-// echo and grep commands. The functions can be called from the dagger CLI or
-// from one of the SDKs.
-//
-// The first line in this comment block is a short description line and the
-// rest is a long description with more detail on the module's purpose or usage,
-// if appropriate. All modules should have a short description.
+//A Dagger pipeline for go generated via Magicinit™
+//                        _      _       _ _
+//                       (_)    (_)     (_) |
+//  _ __ ___   __ _  __ _ _  ___ _ _ __  _| |_
+// | '_ ` _ \ / _` |/ _` | |/ __| | '_ \| | __|
+// | | | | | | (_| | (_| | | (__| | | | | | |_
+// |_| |_| |_|\__,_|\__, |_|\___|_|_| |_|_|\__|
+//                   __/ |
+//                  |___/
 
 package main
 
 import (
 	"context"
 	"dagger/go/internal/dagger"
+	"fmt"
 )
 
-type Go struct{}
-
-// Returns a container that echoes whatever string argument is provided
-func (m *Go) ContainerEcho(stringArg string) *dagger.Container {
-	return dag.Container().From("alpine:latest").WithExec([]string{"echo", stringArg})
+type Go struct {
+	GoVersion string
+	Source    *dagger.Directory
 }
 
-// Returns lines that match a pattern in the files of the provided Directory
-func (m *Go) GrepDir(ctx context.Context, directoryArg *dagger.Directory, pattern string) (string, error) {
-	return dag.Container().
-		From("alpine:latest").
-		WithMountedDirectory("/mnt", directoryArg).
-		WithWorkdir("/mnt").
-		WithExec([]string{"grep", "-R", pattern, "."}).
-		Stdout(ctx)
+func New(
+	goVersion string,
+	// +defaultPath="/"
+	source *dagger.Directory,
+) *Go {
+	return &Go{
+		GoVersion: goVersion,
+		Source:    source,
+	}
+}
+
+func (m *Go) Base(ctx context.Context) *dagger.Container {
+	return dag.
+		Container().
+		From(fmt.Sprintf("golang:%s", m.GoVersion)).
+		WithMountedDirectory("/src", m.Source).
+		WithWorkdir("/src")
+}
+
+func (m *Go) Build(ctx context.Context) *dagger.Container {
+	return m.
+		Base(ctx).
+		WithExec([]string{"go", "build", "-o", "main", "."})
+}
+
+func (m *Go) Lint(ctx context.Context) *dagger.Container {
+	return m.
+		Base(ctx).
+		WithExec([]string{"go", "vet", "."})
+}
+
+func (m *Go) Test(ctx context.Context) *dagger.Container {
+	return m.
+		Base(ctx).
+		WithExec([]string{"go", "test", "-v", "."})
 }

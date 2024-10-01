@@ -1,5 +1,5 @@
 /**
-A Dagger pipeline for Python generated via Magicinit™
+A Dagger pipeline for Ruby generated via Magicinit™
 
                        _      _       _ _   
                       (_)    (_)     (_) |  
