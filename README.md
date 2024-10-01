@@ -1,6 +1,6 @@
-# Future Goals 
+# Magic Init 
 
-* be able to create the dir ourselves in the future 
+![](https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/Wizard_hat_and_wand.svg/1000px-Wizard_hat_and_wand.svg.png?20230507221104)
 
 # Usage 
 
@@ -22,3 +22,7 @@ Go -> https://github.com/DiceDB/dice
 Typescript -> https://github.com/medplum/medplum
 Python -> https://github.com/Cinnamon/kotaemon
 Ruby -> https://github.com/mastodon/mastodon
+
+# Future Goals 
+
+* be able to create the dir ourselves in the future 
