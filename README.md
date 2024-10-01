@@ -4,6 +4,18 @@
 
 # Usage 
 
+Infer project and generate dagger pipeline.
+
+```
+dagger call magicinit -o .dagger
+```
+
+Optional args 
+
+`--sdk` default to language of project, fall back to typescript 
+`--provider` default to gha, in the future be able to generate for others as well 
+`--source` default to .
+
 
 
 # Sample Projects for Testing 
