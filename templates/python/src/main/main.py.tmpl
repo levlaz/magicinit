@@ -11,35 +11,38 @@
  """
 
 import dagger
-from dagger import dag, function, object_type, DefaultPath
-from typing import Annotated
+import anyio
+from dagger import dag, function, object_type, DefaultPath, Doc, field
+from typing import Annotated, Self
 
 @object_type
 class Python:
     source: Annotated[dagger.Directory, DefaultPath("/"), Doc("Source directory of the project, defaults to the root of the repository")]
     {{ if .PythonVersion -}}
-    python_version: Annotated[str, "{{.PythonVersion}}", Doc("Python version to use, defaults to latest")]
+    python_version: Annotated[str, Doc("Python version to use, defaults to latest")] = {{.PythonVersion}}
     {{ else -}}
     # [heads up] We could not infer the python version, so we default to latest
-    python_version: Annotated[str, "latest", Doc("Python version to use, defaults to latest")]
+    python_version: Annotated[str, Doc("Python version to use, defaults to latest")] = "latest"
     {{ end -}}
+    ctr: Annotated[dagger.Container, Doc("Chainable empty container")] = field(default=dag.container())
 
     @function
-    def base(self) -> dagger.Container:
+    def base(self) -> Self:
         """Base container for Python project"""
-        return (
+        self.ctr = (
             dag.
             container().
             from_(f"python:{self.python_version}").
             with_mounted_directory("/src", self.source).
             with_workdir("/src")
         )
+        return self.ctr
     
     @function
-    def build(self):
+    def build(self) -> Self:
         """Build the project"""
         return (
-            self.base().
+            self.ctr.
             with_exec(["pip", "install", "-e", "."]) 
         )
     
@@ -47,7 +50,7 @@ class Python:
     def lint(self):
         """Lint the project"""
         return (
-            self.base().
+            self.ctr.
             with_exec(["pip", "install", "ruff"]).
             with_exec(["ruff", "check", "."])
         )
@@ -56,7 +59,20 @@ class Python:
     def test(self):
         """Test the project"""
         return (
-            self.base().
+            self.ctr.
             with_exec(["pip", "install", "pytest"]).
             with_exec(["pytest"])
         )
+    
+    @function
+    async def ci(self):
+        """Run end to end CI pipeline concurrently"""
+        # install deps 
+        self.base().build()
+
+        async def run(coro):
+            await coro
+
+        async with anyio.create_task_group() as tg:
+            tg.start_soon(run, self.lint())
+            tg.start_soon(run, self.test())
