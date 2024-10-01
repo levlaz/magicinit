@@ -16,8 +16,6 @@ Optional args
 `--provider` default to gha, in the future be able to generate for others as well 
 `--source` default to .
 
-
-
 # Sample Projects for Testing 
 
 Go -> https://github.com/DiceDB/dice 
