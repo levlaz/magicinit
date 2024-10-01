@@ -8,7 +8,7 @@
 |_| |_| |_|\__,_|\__, |_|\___|_|_| |_|_|\__|
                   __/ |                     
                  |___/                      
- """
+"""
 
 import dagger
 import anyio
@@ -36,15 +36,16 @@ class Python:
             with_mounted_directory("/src", self.source).
             with_workdir("/src")
         )
-        return self.ctr
+        return self
     
     @function
     def build(self) -> Self:
         """Build the project"""
-        return (
+        self.ctr = (
             self.ctr.
             with_exec(["pip", "install", "-e", "."]) 
         )
+        return self 
     
     @function
     def lint(self):
