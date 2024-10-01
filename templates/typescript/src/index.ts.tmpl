@@ -14,7 +14,12 @@ import { dag, Container, Directory, object, func, argument } from "@dagger.io/da
 
 @object()
 class Typescript {
+  {{ if .TypescriptVersion -}}
+  typescriptVersion: string = "{{ .TypescriptVersion }}"
+  {{ else -}}
+  // [heads up] We could not infer the typescript version, so we default to latest
   typescriptVersion: string = "latest"
+  {{ end -}}
   source: Directory
 
   /**
