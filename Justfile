@@ -35,3 +35,6 @@ clean:
     rm -rf .typescript
     rm -rf .ruby
     rm -rf .go
+
+edge:
+    dagger -m github.com/TomChv/dagger@ts-sdk/rollback-gql-client call dev with-mounted-directory --path "/src" --source ".ruby/.dagger" with-workdir --path "/src" with-exec --args "dagger,call,--source,https://github.com/aws/aws-sdk-ruby,ci"

@@ -3,6 +3,10 @@
   "sdk": "go",
   "dependencies": [
     {
+      "name": "magicompose",
+      "source": "github.com/TomChv/magicompose@f27d77f79d6646247fa5c425fa09d1e46792d747"
+    },
+    {
       "name": "gha",
       "source": "github.com/shykes/gha@bf36a0b37a75882e4a985179f090d86d2ad1dfb4"
     }
