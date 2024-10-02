@@ -69,6 +69,15 @@ func (m *Magicinit) Init(
 		return nil, fmt.Errorf("Magicinit.Init: unsupported language %s", inspection.Language)
 	}
 
+	// Add compose
+	composeFile, err := lookupCompose(ctx, source)
+	if err != nil {
+		return outputs, nil 
+	}
+
+	composeModule := dag.Magicompose(composeFile).Generate()
+	outputs = outputs.WithDirectory(fmt.Sprintf("%s/services", target), composeModule)
+
 	return outputs, nil
 }
 
