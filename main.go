@@ -32,7 +32,7 @@ func (m *Magicinit) Init(
 	gha := dag.Gha().
 		WithPipeline(
 			"run ci pipeline on every push",
-			"ci",
+			"-m .dagger ci",
 			dagger.GhaWithPipelineOpts{
 				OnPushBranches: []string{"*"},
 			}).
