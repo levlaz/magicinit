@@ -1,0 +1,14 @@
+{
+  "name": "ruby",
+  "sdk": "typescript",
+  "engineVersion": "v0.13.3"
+  {{- if .Compose -}}
+  ,
+  "dependencies": [
+    {
+      "name": "services",
+      "source": "./services"
+    }
+  ]
+  {{ end }}
+}

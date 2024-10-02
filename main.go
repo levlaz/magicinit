@@ -2,8 +2,11 @@ package main
 
 import (
 	"context"
+	"dagger/magicinit/inspection"
+	"dagger/magicinit/stack"
 	"dagger/magicinit/internal/dagger"
 	"fmt"
+	"log"
 )
 
 type Magicinit struct{}
@@ -24,7 +27,7 @@ func (m *Magicinit) Init(
 ) (*dagger.Directory, error) {
 	outputs := dag.Directory()
 
-	inspection, err := m.Inspect(ctx, source)
+	inspection, err := m.inspect(ctx, source)
 	if err != nil {
 		return nil, fmt.Errorf("Magicinit.Init: failed to inspect the source directory: %w", err)
 	}
@@ -40,53 +43,38 @@ func (m *Magicinit) Init(
 
 	outputs = outputs.WithDirectory("/", gha)
 
-	switch inspection.Language {
-	case "go":
-		dir, err := m.initGo(ctx, inspection)
-		if err != nil {
-			return nil, fmt.Errorf("Magicinit.Init: failed to initialize go: %w", err)
-		}
-		outputs = outputs.WithDirectory(target, dir)
-	case "python":
-		dir, err := m.initPython(ctx, inspection)
-		if err != nil {
-			return nil, fmt.Errorf("Magicinit.Init: failed to initialize python: %w", err)
-		}
-		outputs = outputs.WithDirectory(target, dir)
-	case "typescript":
-		dir, err := m.initTypescript(ctx, inspection)
-		if err != nil {
-			return nil, fmt.Errorf("Magicinit.Init: failed to initialize typescript: %w", err)
-		}
-		outputs = outputs.WithDirectory(target, dir)
-	case "ruby":
-		dir, err := m.initRuby(ctx, inspection)
-		if err != nil {
-			return nil, fmt.Errorf("Magicinit.Init: failed to initialize ruby: %w", err)
-		}
-		outputs = outputs.WithDirectory(target, dir)
-	default:
-		return nil, fmt.Errorf("Magicinit.Init: unsupported language %s", inspection.Language)
-	}
-
 	// Add compose
 	composeFile, err := lookupCompose(ctx, source)
-	if err != nil {
-		return outputs, nil 
+	if err == nil {
+		composeModule := dag.Magicompose(composeFile).Generate()
+		outputs = outputs.WithDirectory(fmt.Sprintf("%s/services", target), composeModule)
+		inspection.Compose = true	
+	} else {
+		log.Println("Magicinit.Init: failed to lookup docker-compose.yml or docker-compose.yaml")
+
 	}
 
-	composeModule := dag.Magicompose(composeFile).Generate()
-	outputs = outputs.WithDirectory(fmt.Sprintf("%s/services", target), composeModule)
+	lgStack, err := stack.Get(inspection.Language)
+	if err != nil {
+		return nil, fmt.Errorf("Magicinit.Init: failed to get stack language: %w", err)
+	}
+
+	dir, err := lgStack.Init(ctx, inspection)
+	if err != nil {
+		return nil, fmt.Errorf("Magicinit.Init: failed to initialize stack: %w", err)
+	}
+
+	outputs = outputs.WithDirectory(target, dir)
 
 	return outputs, nil
 }
 
-func (m *Magicinit) Inspect(
+func (m *Magicinit) inspect(
 	ctx context.Context,
 
 	source *dagger.Directory,
-) (*SourceInspect, error) {
-	inspectors := List()
+) (*inspection.Source, error) {
+	inspectors := stack.List()
 
 	for _, inspector := range inspectors {
 		isLanguage, err := inspector.Lookup(ctx, source)
