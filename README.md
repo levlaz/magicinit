@@ -1,6 +1,6 @@
 # Magic Init 
 
-![](https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/Wizard_hat_and_wand.svg/1000px-Wizard_hat_and_wand.svg.png?20230507221104)
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/Wizard_hat_and_wand.svg/1000px-Wizard_hat_and_wand.svg.png?20230507221104" height="200">
 
 MagicInit is a Dagger Module that runs inference on your project and generates a relevant starter module. Go from 0 to pipeline with one command. 
 
